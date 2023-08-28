@@ -6,16 +6,49 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct ContentView: View {
+    @State var started = 0
+    
     var body: some View {
         VStack {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundColor(.accentColor)
-            Text("Hello, world!")
+//            TextField.init(text: "please input timeInterval") {
+//                NSLog("inputed == %@", text)
+//            }
+            Button("Started: \(started)") {
+                if self.started != 1 {
+                    StartAlert(timeInterVal: TimeInterval(integerLiteral: 60 * 50))
+                }
+            }
+    
         }
         .padding()
+    }
+    
+    //time interval must be at least 60 if repeating
+    func StartAlert(timeInterVal:TimeInterval) -> Void {
+        print("==StartAlert==")
+        self.started = 1
+        UNUserNotificationCenter.current().requestAuthorization { granted, err in
+            if granted {
+                let content = UNMutableNotificationContent()
+                content.title = "Tips"
+                content.body = "Time For Get Up!!!"
+                content.sound = UNNotificationSound.default
+                
+                //time interval must be at least 60 if repeating
+                let aTrigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterVal, repeats: true)
+                
+                let request = UNNotificationRequest(identifier: "Health", content: content, trigger: aTrigger)
+                
+                UNUserNotificationCenter.current().add(request)
+            }
+        }
+        
     }
 }
 
